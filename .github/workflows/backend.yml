@@ -1,0 +1,19 @@
+name: Backend Deployment to Hugging Face
+on:
+  push:
+    branches: [ main ]
+    paths: [ 'backend/**' ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Push to HF Spaces
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          git remote add hf https://muhammadfaheem52006:$HF_TOKEN@huggingface.co/spaces/muhammadfaheem52006/LMSBACKEND
+          git push --force hf main
