@@ -1,17 +1,27 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navbar';
-import LandingPage from './pages/LandingPage';
-import LoginPage from './pages/LoginPage';
-import StudentDashboard from './pages/StudentDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
+import { Loader2 } from 'lucide-react';
 
-import AdminDashboard from './pages/admin/AdminDashboard';
-import AcademicManagement from './pages/admin/AcademicManagement';
-import EnrollmentManagement from './pages/admin/EnrollmentManagement';
+// Lazy Load Pages for Performance Optimization
+const LandingPage = lazy(() => import('./pages/LandingPage'));
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const AdmissionForm = lazy(() => import('./pages/AdmissionForm'));
+const StudentDashboard = lazy(() => import('./pages/StudentDashboard'));
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
+const AcademicManagement = lazy(() => import('./pages/admin/AcademicManagement'));
+const EnrollmentManagement = lazy(() => import('./pages/admin/EnrollmentManagement'));
 
-// Placeholder components for other Dashboards
+// Loading Fallback Component
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center bg-slate-50">
+    <Loader2 className="h-12 w-12 animate-spin text-blue-900" />
+  </div>
+);
+
+// Placeholder components
 const TeacherDashboard = () => <div className="p-8"><h1>Teacher Dashboard (Coming Soon)</h1></div>;
 
 function App() {
@@ -19,47 +29,50 @@ function App() {
     <AuthProvider>
       <Router>
         <div className="min-h-screen bg-slate-50">
-          <Routes>
-            {/* Public Routes with Navbar */}
-            <Route path="/" element={<><Navbar /><LandingPage /></>} />
-            <Route path="/login" element={<><Navbar /><LoginPage /></>} />
-            
-            {/* Dashboard Routes (No Navbar, DashboardLayout has its own) */}
-            <Route path="/dashboard" element={
-              <ProtectedRoute roles={['student']}>
-                <StudentDashboard />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/teacher" element={
-              <ProtectedRoute roles={['teacher']}>
-                <TeacherDashboard />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/admin" element={
-              <ProtectedRoute roles={['admin']}>
-                <AdminDashboard />
-              </ProtectedRoute>
-            } />
-            <Route path="/admin/academics" element={
-              <ProtectedRoute roles={['admin']}>
-                <AcademicManagement />
-              </ProtectedRoute>
-            } />
-            <Route path="/admin/enrollments" element={
-              <ProtectedRoute roles={['admin']}>
-                <EnrollmentManagement />
-              </ProtectedRoute>
-            } />
-            <Route path="/admin/payments" element={
-              <ProtectedRoute roles={['admin']}>
-                <div className="p-8"><h1>Payments & Vouchers (Coming Soon)</h1></div>
-              </ProtectedRoute>
-            } />
-
-            {/* Sub-routes for dashboards can be added here */}
-          </Routes>
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<><Navbar /><LandingPage /></>} />
+              <Route path="/login" element={<><Navbar /><LoginPage /></>} />
+              <Route path="/admissions/apply" element={<AdmissionForm />} />
+              
+              {/* Protected Student Routes */}
+              <Route path="/dashboard" element={
+                <ProtectedRoute roles={['student']}>
+                  <StudentDashboard />
+                </ProtectedRoute>
+              } />
+              
+              {/* Protected Teacher Routes */}
+              <Route path="/teacher" element={
+                <ProtectedRoute roles={['teacher']}>
+                  <TeacherDashboard />
+                </ProtectedRoute>
+              } />
+              
+              {/* Protected Admin Routes */}
+              <Route path="/admin" element={
+                <ProtectedRoute roles={['admin']}>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin/academics" element={
+                <ProtectedRoute roles={['admin']}>
+                  <AcademicManagement />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin/enrollments" element={
+                <ProtectedRoute roles={['admin']}>
+                  <EnrollmentManagement />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin/payments" element={
+                <ProtectedRoute roles={['admin']}>
+                  <div className="p-8"><h1>Payments & Vouchers (Coming Soon)</h1></div>
+                </ProtectedRoute>
+              } />
+            </Routes>
+          </Suspense>
         </div>
       </Router>
     </AuthProvider>

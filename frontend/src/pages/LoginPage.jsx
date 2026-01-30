@@ -112,7 +112,10 @@ const LoginPage = () => {
                   New to RSIIT? Start your journey today.
                 </p>
                 <div className="mt-2">
-                  <button className="text-sm font-bold text-amber-800 underline hover:text-amber-900">
+                  <button 
+                    onClick={() => navigate('/admissions/apply')}
+                    className="text-sm font-bold text-amber-800 underline hover:text-amber-900"
+                  >
                     Apply for New Admission &rarr;
                   </button>
                 </div>
