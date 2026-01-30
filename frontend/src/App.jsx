@@ -7,9 +7,10 @@ import LoginPage from './pages/LoginPage';
 import StudentDashboard from './pages/StudentDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 
+import AdminDashboard from './pages/admin/AdminDashboard';
+
 // Placeholder components for other Dashboards
 const TeacherDashboard = () => <div className="p-8"><h1>Teacher Dashboard (Coming Soon)</h1></div>;
-const AdminDashboard = () => <div className="p-8"><h1>Admin Dashboard (Coming Soon)</h1></div>;
 
 function App() {
   return (
