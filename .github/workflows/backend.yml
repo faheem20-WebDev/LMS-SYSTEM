@@ -11,9 +11,28 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
+      
       - name: Push to HF Spaces
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          git remote add hf https://muhammadfaheem52006:$HF_TOKEN@huggingface.co/spaces/muhammadfaheem52006/LMSBACKEND
-          git push --force hf main
+          # Configure git
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+          
+          # Clone the HF repo to a temp dir
+          git clone https://muhammadfaheem52006:$HF_TOKEN@huggingface.co/spaces/muhammadfaheem52006/LMSBACKEND hf_repo
+          
+          # Remove everything in HF repo except .git
+          cd hf_repo
+          find . -maxdepth 1 ! -name '.git' ! -name '.' ! -name '..' -exec rm -rf {} +
+          
+          # Copy backend files to HF repo root
+          cd ..
+          cp -r backend/* hf_repo/
+          
+          # Commit and push
+          cd hf_repo
+          git add .
+          git commit -m "Deploy backend from GitHub Actions" --allow-empty
+          git push origin main
