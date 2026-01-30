@@ -44,8 +44,7 @@ const DashboardLayout = ({ children }) => {
 
   const adminLinks = [
     { name: 'Overview', path: '/admin', icon: LayoutDashboard },
-    { name: 'Semester Setup', path: '/admin/semesters', icon: Calendar },
-    { name: 'Manage Courses', path: '/admin/courses', icon: BookOpen },
+    { name: 'Academics & Courses', path: '/admin/academics', icon: BookOpen },
     { name: 'Enrollments', path: '/admin/enrollments', icon: User },
     { name: 'Payments', path: '/admin/payments', icon: CreditCard },
   ];

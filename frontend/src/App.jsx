@@ -46,6 +46,16 @@ function App() {
                 <AcademicManagement />
               </ProtectedRoute>
             } />
+            <Route path="/admin/enrollments" element={
+              <ProtectedRoute roles={['admin']}>
+                <div className="p-8"><h1>Enrollments Management (Coming Soon)</h1></div>
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/payments" element={
+              <ProtectedRoute roles={['admin']}>
+                <div className="p-8"><h1>Payments & Vouchers (Coming Soon)</h1></div>
+              </ProtectedRoute>
+            } />
 
             {/* Sub-routes for dashboards can be added here */}
           </Routes>
