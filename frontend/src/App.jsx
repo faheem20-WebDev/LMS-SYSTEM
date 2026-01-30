@@ -9,6 +9,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AcademicManagement from './pages/admin/AcademicManagement';
+import EnrollmentManagement from './pages/admin/EnrollmentManagement';
 
 // Placeholder components for other Dashboards
 const TeacherDashboard = () => <div className="p-8"><h1>Teacher Dashboard (Coming Soon)</h1></div>;
@@ -48,7 +49,7 @@ function App() {
             } />
             <Route path="/admin/enrollments" element={
               <ProtectedRoute roles={['admin']}>
-                <div className="p-8"><h1>Enrollments Management (Coming Soon)</h1></div>
+                <EnrollmentManagement />
               </ProtectedRoute>
             } />
             <Route path="/admin/payments" element={
