@@ -1,6 +1,10 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-rsiit-blue: #1e3a8a;
+  --color-rsiit-lightBlue: #3b82f6;
+  --color-rsiit-slate: #334155;
+}
 
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
