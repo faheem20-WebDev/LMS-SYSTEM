@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, Users, Award, ArrowRight } from 'lucide-react';
+import { BookOpen, Users, Award, ArrowRight, GraduationCap } from 'lucide-react';
 
 const LandingPage = () => {
   return (
