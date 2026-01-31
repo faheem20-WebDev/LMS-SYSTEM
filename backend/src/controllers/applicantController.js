@@ -80,7 +80,14 @@ exports.submitApplication = async (req, res) => {
       (applicant_id, program_id, personal_info, contact_info, guardian_info, education_info, status, submitted_at) 
       VALUES ($1, $2, $3, $4, $5, $6, 'fee_challan_issued', CURRENT_TIMESTAMP) 
       RETURNING *`,
-      [applicant_id, program_id, personal_info, contact_info, guardian_info, education_info]
+      [
+        applicant_id, 
+        program_id, 
+        JSON.stringify(personal_info), 
+        JSON.stringify(contact_info), 
+        JSON.stringify(guardian_info), 
+        JSON.stringify(education_info)
+      ]
     );
 
     res.json(newApp.rows[0]);
