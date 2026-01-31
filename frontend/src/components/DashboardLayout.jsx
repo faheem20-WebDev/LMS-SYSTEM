@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useApplicant } from '../context/ApplicantContext';
 import { 
   LayoutDashboard, 
   BookOpen, 
@@ -12,13 +13,30 @@ import {
   X,
   GraduationCap,
   User,
-  CreditCard
+  CreditCard,
+  FileText,
+  Upload,
+  Phone
 } from 'lucide-react';
 import RealtimeClock from './RealtimeClock';
 
 const DashboardLayout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user, logout } = useAuth();
+  
+  // Safe consumption of Applicant Context (only exists if wrapped)
+  let applicantContext = {};
+  try {
+     applicantContext = useApplicant();
+  } catch (e) {
+     // Ignore if context is missing (e.g. for non-applicants if provider isn't wrapping them)
+  }
+  
+  const { 
+    isProfileComplete, 
+    hasSubmittedApplication 
+  } = applicantContext || {};
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -45,14 +63,19 @@ const DashboardLayout = ({ children }) => {
   const adminLinks = [
     { name: 'Overview', path: '/admin', icon: LayoutDashboard },
     { name: 'Academics', path: '/admin/academics', icon: BookOpen },
-    { name: 'Admissions', path: '/admin/admissions', icon: User }, // New Applicants
-    { name: 'Course Reg.', path: '/admin/enrollments', icon: ClipboardList }, // Existing Students
+    { name: 'Admissions', path: '/admin/admissions', icon: User },
+    { name: 'Course Reg.', path: '/admin/enrollments', icon: ClipboardList },
     { name: 'Payments', path: '/admin/payments', icon: CreditCard },
   ];
 
   const applicantLinks = [
-    { name: 'Dashboard', path: '/applicant/dashboard', icon: LayoutDashboard },
-    { name: 'New Application', path: '/applicant/dashboard', icon: BookOpen }, // Points to dashboard where list is
+    { name: 'Home', path: '/applicant/dashboard', icon: LayoutDashboard, disabled: false },
+    { name: 'Admission Schedule', path: '/applicant/dashboard/schedule', icon: Calendar, disabled: false },
+    { name: 'Profile Information', path: '/applicant/dashboard/profile', icon: User, disabled: false },
+    { name: 'Apply for Program', path: '/applicant/dashboard/apply', icon: GraduationCap, disabled: !isProfileComplete },
+    { name: 'Academic Documents', path: '/applicant/dashboard/documents', icon: Upload, disabled: !hasSubmittedApplication },
+    { name: 'Fee Voucher', path: '/applicant/dashboard/voucher', icon: CreditCard, disabled: !hasSubmittedApplication },
+    { name: 'Contact Us', path: '/applicant/dashboard/contact', icon: Phone, disabled: false },
   ];
 
   const links = user?.role === 'admin' ? adminLinks 
@@ -61,7 +84,7 @@ const DashboardLayout = ({ children }) => {
               : studentLinks;
 
   return (
-    <div className="min-h-screen bg-slate-50 flex">
+    <div className="min-h-screen bg-[#F5F7FA] flex">
       {/* Mobile Sidebar Overlay */}
       <div 
         className={`fixed inset-0 bg-slate-900/50 z-40 transition-opacity duration-300 lg:hidden ${sidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
@@ -72,7 +95,7 @@ const DashboardLayout = ({ children }) => {
       <aside className={`fixed inset-y-0 left-0 z-50 w-72 bg-rsiit-slate text-white transform transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="flex flex-col h-full">
           <div className="p-6 flex items-center gap-3">
-            <GraduationCap className="h-10 w-10 text-blue-400" />
+            <GraduationCap className="h-10 w-10 text-accent" />
             <div>
               <h1 className="text-xl font-bold tracking-tight">RSIIT LMS</h1>
               <p className="text-xs text-slate-400 uppercase tracking-widest">{user?.role} Portal</p>
@@ -82,16 +105,29 @@ const DashboardLayout = ({ children }) => {
           <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
             {links.map((link) => {
               const Icon = link.icon;
-              const isActive = location.pathname === link.path;
+              // Check for exact match for root dashboard, or startsWith for sub-routes
+              const isActive = link.path === '/applicant/dashboard' 
+                ? location.pathname === link.path 
+                : location.pathname.startsWith(link.path);
+              
+              const isDisabled = link.disabled;
+
               return (
                 <Link
                   key={link.name}
-                  to={link.path}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${isActive ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}
-                  onClick={() => setSidebarOpen(false)}
+                  to={isDisabled ? '#' : link.path}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all 
+                    ${isActive ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}
+                    ${isDisabled ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}
+                  `}
+                  onClick={(e) => {
+                    if (isDisabled) e.preventDefault();
+                    setSidebarOpen(false);
+                  }}
                 >
                   <Icon className="h-5 w-5" />
                   <span className="font-medium">{link.name}</span>
+                  {isDisabled && <span className="ml-auto text-xs opacity-70">Locked</span>}
                 </Link>
               );
             })}
@@ -129,7 +165,7 @@ const DashboardLayout = ({ children }) => {
               <p className="text-sm font-bold text-rsiit-slate">{user?.name}</p>
               <p className="text-xs text-slate-500">{user?.department || 'RSIIT Student'}</p>
             </div>
-            <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-rsiit-blue font-bold">
+            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
               {user?.name?.charAt(0)}
             </div>
           </div>

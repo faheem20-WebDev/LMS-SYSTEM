@@ -1,6 +1,7 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { ApplicantProvider } from './context/ApplicantContext';
 import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
 import { Loader2 } from 'lucide-react';
@@ -31,70 +32,72 @@ const TeacherDashboard = () => <div className="p-8"><h1>Teacher Dashboard (Comin
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <div className="min-h-screen bg-slate-50">
-          <Suspense fallback={<PageLoader />}>
-            <Routes>
-              {/* Public Routes */}
-              <Route path="/" element={<><Navbar /><LandingPage /></>} />
-              <Route path="/login" element={<><Navbar /><LoginPage /></>} />
-              <Route path="/admissions/apply" element={<AdmissionForm />} />
-              <Route path="/applicant/register" element={<ApplicantRegister />} />
-              
-              {/* Protected Student Routes */}
-              <Route path="/dashboard" element={
-                <ProtectedRoute roles={['student']}>
-                  <StudentDashboard />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/applicant/dashboard" element={
-                <ProtectedRoute roles={['applicant']}>
-                  <ApplicantDashboard />
-                </ProtectedRoute>
-              } />
-              <Route path="/applicant/apply/:programId" element={
-                <ProtectedRoute roles={['applicant']}>
-                  <ApplicationForm />
-                </ProtectedRoute>
-              } />
+      <ApplicantProvider>
+        <Router>
+          <div className="min-h-screen bg-[#F5F7FA]">
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
+                {/* Public Routes */}
+                <Route path="/" element={<><Navbar /><LandingPage /></>} />
+                <Route path="/login" element={<><Navbar /><LoginPage /></>} />
+                <Route path="/admissions/apply" element={<AdmissionForm />} />
+                <Route path="/applicant/register" element={<ApplicantRegister />} />
+                
+                {/* Protected Student Routes */}
+                <Route path="/dashboard" element={
+                  <ProtectedRoute roles={['student']}>
+                    <StudentDashboard />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/applicant/dashboard/*" element={
+                  <ProtectedRoute roles={['applicant']}>
+                    <ApplicantDashboard />
+                  </ProtectedRoute>
+                } />
+                <Route path="/applicant/apply/:programId" element={
+                  <ProtectedRoute roles={['applicant']}>
+                    <ApplicationForm />
+                  </ProtectedRoute>
+                } />
 
-              {/* Protected Teacher Routes */}
-              <Route path="/teacher" element={
-                <ProtectedRoute roles={['teacher']}>
-                  <TeacherDashboard />
-                </ProtectedRoute>
-              } />
-              
-              {/* Protected Admin Routes */}
-              <Route path="/admin" element={
-                <ProtectedRoute roles={['admin']}>
-                  <AdminDashboard />
-                </ProtectedRoute>
-              } />
-              <Route path="/admin/academics" element={
-                <ProtectedRoute roles={['admin']}>
-                  <AcademicManagement />
-                </ProtectedRoute>
-              } />
-                          <Route path="/admin/enrollments" element={
-                            <ProtectedRoute roles={['admin']}>
-                              <EnrollmentManagement />
-                            </ProtectedRoute>
-                          } />
-                          <Route path="/admin/admissions" element={
-                            <ProtectedRoute roles={['admin']}>
-                              <AdmissionApplications />
-                            </ProtectedRoute>
-                          } />              <Route path="/admin/payments" element={
-                <ProtectedRoute roles={['admin']}>
-                  <div className="p-8"><h1>Payments & Vouchers (Coming Soon)</h1></div>
-                </ProtectedRoute>
-              } />
-            </Routes>
-          </Suspense>
-        </div>
-      </Router>
+                {/* Protected Teacher Routes */}
+                <Route path="/teacher" element={
+                  <ProtectedRoute roles={['teacher']}>
+                    <TeacherDashboard />
+                  </ProtectedRoute>
+                } />
+                
+                {/* Protected Admin Routes */}
+                <Route path="/admin" element={
+                  <ProtectedRoute roles={['admin']}>
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/academics" element={
+                  <ProtectedRoute roles={['admin']}>
+                    <AcademicManagement />
+                  </ProtectedRoute>
+                } />
+                            <Route path="/admin/enrollments" element={
+                              <ProtectedRoute roles={['admin']}>
+                                <EnrollmentManagement />
+                              </ProtectedRoute>
+                            } />
+                            <Route path="/admin/admissions" element={
+                              <ProtectedRoute roles={['admin']}>
+                                <AdmissionApplications />
+                              </ProtectedRoute>
+                            } />              <Route path="/admin/payments" element={
+                  <ProtectedRoute roles={['admin']}>
+                    <div className="p-8"><h1>Payments & Vouchers (Coming Soon)</h1></div>
+                  </ProtectedRoute>
+                } />
+              </Routes>
+            </Suspense>
+          </div>
+        </Router>
+      </ApplicantProvider>
     </AuthProvider>
   );
 }
