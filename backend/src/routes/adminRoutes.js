@@ -12,11 +12,19 @@ const {
   createCourse, 
   getAllCourses, 
   allocateCourse,
-  getAdminStats
+  getAdminStats,
+  getApplications,
+  updateAppStatus,
+  deleteApplication
 } = require('../controllers/adminOpsController');
 
 // All routes require Admin role
 router.use(auth, authorize('admin'));
+
+// Admission Applications
+router.get('/applications', getApplications);
+router.put('/applications/:id/status', updateAppStatus);
+router.delete('/applications/:id', deleteApplication);
 
 // Dashboard Stats
 router.get('/stats', getAdminStats);

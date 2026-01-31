@@ -44,12 +44,21 @@ const DashboardLayout = ({ children }) => {
 
   const adminLinks = [
     { name: 'Overview', path: '/admin', icon: LayoutDashboard },
-    { name: 'Academics & Courses', path: '/admin/academics', icon: BookOpen },
-    { name: 'Enrollments', path: '/admin/enrollments', icon: User },
+    { name: 'Academics', path: '/admin/academics', icon: BookOpen },
+    { name: 'Admissions', path: '/admin/admissions', icon: User }, // New Applicants
+    { name: 'Course Reg.', path: '/admin/enrollments', icon: ClipboardList }, // Existing Students
     { name: 'Payments', path: '/admin/payments', icon: CreditCard },
   ];
 
-  const links = user?.role === 'admin' ? adminLinks : user?.role === 'teacher' ? teacherLinks : studentLinks;
+  const applicantLinks = [
+    { name: 'Dashboard', path: '/applicant/dashboard', icon: LayoutDashboard },
+    { name: 'New Application', path: '/applicant/dashboard', icon: BookOpen }, // Points to dashboard where list is
+  ];
+
+  const links = user?.role === 'admin' ? adminLinks 
+              : user?.role === 'teacher' ? teacherLinks 
+              : user?.role === 'applicant' ? applicantLinks
+              : studentLinks;
 
   return (
     <div className="min-h-screen bg-slate-50 flex">

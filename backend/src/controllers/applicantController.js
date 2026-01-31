@@ -72,7 +72,7 @@ exports.submitApplication = async (req, res) => {
     const newApp = await db.query(
       `INSERT INTO applications 
       (applicant_id, program_id, personal_info, contact_info, guardian_info, education_info, status, submitted_at) 
-      VALUES ($1, $2, $3, $4, $5, $6, 'submitted', CURRENT_TIMESTAMP) 
+      VALUES ($1, $2, $3, $4, $5, $6, 'fee_challan_issued', CURRENT_TIMESTAMP) 
       RETURNING *`,
       [applicant_id, program_id, personal_info, contact_info, guardian_info, education_info]
     );

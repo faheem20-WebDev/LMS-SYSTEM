@@ -4,7 +4,8 @@ const {
   getAvailableCourses, 
   requestRegistration, 
   getEnrollmentRequests, 
-  updateEnrollmentStatus 
+  updateEnrollmentStatus,
+  deleteEnrollmentRequest
 } = require('../controllers/courseController');
 const { auth, authorize } = require('../middleware/auth');
 
@@ -14,5 +15,6 @@ router.post('/register', auth, requestRegistration);
 // Admin only routes
 router.get('/requests', auth, authorize('admin'), getEnrollmentRequests);
 router.put('/request-status', auth, authorize('admin'), updateEnrollmentStatus);
+router.delete('/requests/:id', auth, authorize('admin'), deleteEnrollmentRequest);
 
 module.exports = router;

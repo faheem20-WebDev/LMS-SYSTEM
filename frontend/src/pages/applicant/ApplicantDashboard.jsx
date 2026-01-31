@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import DashboardLayout from '../../components/DashboardLayout';
-import { Plus, Clock, FileText, CheckCircle } from 'lucide-react';
+import { Plus, Clock, FileText, CheckCircle, Download } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { jsPDF } from 'jspdf';
+import { useAuth } from '../../context/AuthContext';
 
 const ApplicantDashboard = () => {
   const [programs, setPrograms] = useState([]);
   const [myApplications, setMyApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   // Dynamic API URL
   const API_URL = 'https://muhammadfaheem52006-lmsbackend.hf.space/api';
@@ -30,6 +33,59 @@ const ApplicantDashboard = () => {
     };
     fetchData();
   }, []);
+
+  const generateVoucher = (app) => {
+    const doc = new jsPDF();
+    
+    // Header
+    doc.setFontSize(22);
+    doc.setTextColor(30, 58, 138); // RSIIT Blue
+    doc.text('RSIIT ADMISSION CHALLAN', 105, 20, { align: 'center' });
+    
+    doc.setFontSize(12);
+    doc.setTextColor(100);
+    doc.text('Rising Star Institute of Information and Technology', 105, 28, { align: 'center' });
+    
+    doc.setLineWidth(0.5);
+    doc.line(20, 35, 190, 35);
+
+    // Applicant Info
+    doc.setFontSize(12);
+    doc.setTextColor(0);
+    doc.text(`Applicant Name: ${user.name}`, 20, 50);
+    doc.text(`Application ID: ${app.id}`, 140, 50);
+    doc.text(`Program: ${app.program_name}`, 20, 60);
+    doc.text(`Date Issued: ${new Date().toLocaleDateString()}`, 140, 60);
+
+    // Fee Table
+    doc.autoTable = null; // Basic text for now, can use autoTable plugin if installed
+    
+    doc.setFillColor(240, 240, 240);
+    doc.rect(20, 75, 170, 10, 'F');
+    doc.setFont(undefined, 'bold');
+    doc.text('Description', 25, 82);
+    doc.text('Amount (PKR)', 150, 82);
+    
+    doc.setFont(undefined, 'normal');
+    doc.text('Admission Processing Fee', 25, 95);
+    doc.text('2,500', 150, 95);
+    
+    doc.setLineWidth(0.2);
+    doc.line(20, 100, 190, 100);
+    
+    doc.setFont(undefined, 'bold');
+    doc.text('Total Payable:', 110, 110);
+    doc.text('PKR 2,500', 150, 110);
+
+    // Bank Info
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text('Bank: HBL (Habib Bank Limited)', 20, 130);
+    doc.text('Account Title: RSIIT Admissions', 20, 136);
+    doc.text('Account No: 1234-56789012-03', 20, 142);
+
+    doc.save(`RSIIT_Challan_${app.id}.pdf`);
+  };
 
   return (
     <DashboardLayout>
@@ -76,6 +132,7 @@ const ApplicantDashboard = () => {
                     <th className="p-4">Program</th>
                     <th className="p-4">Date Submitted</th>
                     <th className="p-4">Status</th>
+                    <th className="p-4">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -85,10 +142,20 @@ const ApplicantDashboard = () => {
                       <td className="p-4 text-slate-500 text-sm">{new Date(app.submitted_at).toLocaleDateString()}</td>
                       <td className="p-4">
                         <span className={`px-3 py-1 rounded-full text-xs font-bold capitalize
-                          ${app.status === 'submitted' ? 'bg-blue-100 text-blue-700' : 
+                          ${app.status === 'fee_challan_issued' ? 'bg-amber-100 text-amber-700' : 
                             app.status === 'admitted' ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-600'}`}>
-                          {app.status.replace('_', ' ')}
+                          {app.status.replace(/_/g, ' ')}
                         </span>
+                      </td>
+                      <td className="p-4">
+                        {app.status === 'fee_challan_issued' && (
+                          <button 
+                            onClick={() => generateVoucher(app)}
+                            className="flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm font-bold"
+                          >
+                            <Download className="h-4 w-4" /> Voucher
+                          </button>
+                        )}
                       </td>
                     </tr>
                   ))}

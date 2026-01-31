@@ -65,6 +65,48 @@ exports.allocateCourse = async (req, res) => {
   }
 };
 
+// --- Admission Applications ---
+exports.getApplications = async (req, res) => {
+  try {
+    const apps = await db.query(`
+      SELECT a.*, p.code as program_code
+      FROM applications a
+      JOIN programs p ON a.program_id = p.id
+      ORDER BY a.submitted_at DESC
+    `);
+    res.json(apps.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+};
+
+exports.updateAppStatus = async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  try {
+    const result = await db.query(
+      'UPDATE applications SET status = $1 WHERE id = $2 RETURNING *',
+      [status, id]
+    );
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+};
+
+exports.deleteApplication = async (req, res) => {
+  const { id } = req.params;
+  try {
+    await db.query('DELETE FROM applications WHERE id = $1', [id]);
+    res.json({ msg: 'Application deleted' });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+};
+
 // --- Dashboard Stats ---
 exports.getAdminStats = async (req, res) => {
   try {

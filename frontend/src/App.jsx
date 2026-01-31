@@ -13,6 +13,7 @@ const StudentDashboard = lazy(() => import('./pages/StudentDashboard'));
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 const AcademicManagement = lazy(() => import('./pages/admin/AcademicManagement'));
 const EnrollmentManagement = lazy(() => import('./pages/admin/EnrollmentManagement'));
+const AdmissionApplications = lazy(() => import('./pages/admin/AdmissionApplications'));
 const ApplicantRegister = lazy(() => import('./pages/applicant/ApplicantRegister'));
 const ApplicantDashboard = lazy(() => import('./pages/applicant/ApplicantDashboard'));
 const ApplicationForm = lazy(() => import('./pages/applicant/ApplicationForm'));
@@ -76,12 +77,16 @@ function App() {
                   <AcademicManagement />
                 </ProtectedRoute>
               } />
-              <Route path="/admin/enrollments" element={
-                <ProtectedRoute roles={['admin']}>
-                  <EnrollmentManagement />
-                </ProtectedRoute>
-              } />
-              <Route path="/admin/payments" element={
+                          <Route path="/admin/enrollments" element={
+                            <ProtectedRoute roles={['admin']}>
+                              <EnrollmentManagement />
+                            </ProtectedRoute>
+                          } />
+                          <Route path="/admin/admissions" element={
+                            <ProtectedRoute roles={['admin']}>
+                              <AdmissionApplications />
+                            </ProtectedRoute>
+                          } />              <Route path="/admin/payments" element={
                 <ProtectedRoute roles={['admin']}>
                   <div className="p-8"><h1>Payments & Vouchers (Coming Soon)</h1></div>
                 </ProtectedRoute>

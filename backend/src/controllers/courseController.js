@@ -88,3 +88,15 @@ exports.updateEnrollmentStatus = async (req, res) => {
     res.status(500).send('Server error');
   }
 };
+
+// Admin: Delete Enrollment Request
+exports.deleteEnrollmentRequest = async (req, res) => {
+  const { id } = req.params;
+  try {
+    await db.query('DELETE FROM enrollments WHERE id = $1', [id]);
+    res.json({ msg: 'Enrollment request deleted' });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+};

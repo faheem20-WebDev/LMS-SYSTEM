@@ -1,7 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import DashboardLayout from '../../components/DashboardLayout';
-import { CheckCircle, XCircle, Loader2, User, Book } from 'lucide-react';
+import { CheckCircle, XCircle, Loader2, User, Book, Trash2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 const API_URL = 'https://muhammadfaheem52006-lmsbackend.hf.space/api';
@@ -34,10 +31,23 @@ const EnrollmentManagement = () => {
         enrollment_id: id,
         status: status
       });
-      // Remove the processed request from the list
+      // Remove the processed request from the list (or update status locally if we were showing all)
       setRequests(requests.filter(req => req.id !== id));
     } catch (err) {
       alert('Failed to update status');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to permanently delete this application?')) return;
+    setActionLoading(id);
+    try {
+      await axios.delete(`${API_URL}/courses/requests/${id}`);
+      setRequests(requests.filter(req => req.id !== id));
+    } catch (err) {
+      alert('Failed to delete application');
     } finally {
       setActionLoading(null);
     }
@@ -105,11 +115,11 @@ const EnrollmentManagement = () => {
                           </button>
                           <button
                             disabled={actionLoading === req.id}
-                            onClick={() => handleStatusUpdate(req.id, 'denied')}
+                            onClick={() => handleDelete(req.id)}
                             className="flex items-center gap-1 bg-red-50 text-red-700 px-3 py-1.5 rounded-lg font-bold text-xs hover:bg-red-100 transition-colors"
                           >
-                            <XCircle className="h-3 w-3" />
-                            Deny
+                            <Trash2 className="h-3 w-3" />
+                            Delete
                           </button>
                         </div>
                       </td>
