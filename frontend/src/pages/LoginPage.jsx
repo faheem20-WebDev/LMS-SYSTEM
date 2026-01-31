@@ -49,6 +49,7 @@ const LoginPage = () => {
       
       if (data.user.role === 'admin') navigate('/admin');
       else if (data.user.role === 'teacher') navigate('/teacher');
+      else if (data.user.role === 'applicant') navigate('/applicant/dashboard');
       else navigate('/dashboard');
     } catch (err) {
       setError(err.message || err.response?.data?.msg || 'Failed to login. Please check your credentials.');
@@ -113,10 +114,10 @@ const LoginPage = () => {
                 </p>
                 <div className="mt-2">
                   <button 
-                    onClick={() => navigate('/admissions/apply')}
+                    onClick={() => navigate('/applicant/register')}
                     className="text-sm font-bold text-amber-800 underline hover:text-amber-900"
                   >
-                    Apply for New Admission &rarr;
+                    Create Applicant Account &rarr;
                   </button>
                 </div>
               </div>

@@ -13,6 +13,9 @@ const StudentDashboard = lazy(() => import('./pages/StudentDashboard'));
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 const AcademicManagement = lazy(() => import('./pages/admin/AcademicManagement'));
 const EnrollmentManagement = lazy(() => import('./pages/admin/EnrollmentManagement'));
+const ApplicantRegister = lazy(() => import('./pages/applicant/ApplicantRegister'));
+const ApplicantDashboard = lazy(() => import('./pages/applicant/ApplicantDashboard'));
+const ApplicationForm = lazy(() => import('./pages/applicant/ApplicationForm'));
 
 // Loading Fallback Component
 const PageLoader = () => (
@@ -35,6 +38,7 @@ function App() {
               <Route path="/" element={<><Navbar /><LandingPage /></>} />
               <Route path="/login" element={<><Navbar /><LoginPage /></>} />
               <Route path="/admissions/apply" element={<AdmissionForm />} />
+              <Route path="/applicant/register" element={<ApplicantRegister />} />
               
               {/* Protected Student Routes */}
               <Route path="/dashboard" element={
@@ -43,6 +47,17 @@ function App() {
                 </ProtectedRoute>
               } />
               
+              <Route path="/applicant/dashboard" element={
+                <ProtectedRoute roles={['applicant']}>
+                  <ApplicantDashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/applicant/apply/:programId" element={
+                <ProtectedRoute roles={['applicant']}>
+                  <ApplicationForm />
+                </ProtectedRoute>
+              } />
+
               {/* Protected Teacher Routes */}
               <Route path="/teacher" element={
                 <ProtectedRoute roles={['teacher']}>
