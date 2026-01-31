@@ -29,10 +29,15 @@ const ApplicationForm = () => {
   const handleChange = (e) => setFormData({...formData, [e.target.name]: e.target.value});
 
   const handleSubmit = async () => {
+    if (!programId) {
+      alert("Error: Program ID is missing. Please select a program from the dashboard.");
+      return;
+    }
+
     setLoading(true);
     try {
       await axios.post(`${API_URL}/applicants/apply`, {
-        program_id: programId,
+        program_id: parseInt(programId),
         personal_info: {
           fullName: formData.fullName, dob: formData.dob, cnic: formData.cnic,
           nationality: formData.nationality, religion: formData.religion, bloodGroup: formData.bloodGroup
@@ -52,6 +57,7 @@ const ApplicationForm = () => {
       });
       navigate('/applicant/dashboard');
     } catch (err) {
+      console.error("Submission Error:", err);
       alert('Application Failed: ' + (err.response?.data?.msg || err.message));
     } finally {
       setLoading(false);
@@ -63,7 +69,7 @@ const ApplicationForm = () => {
       <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         {/* Progress Bar */}
         <div className="bg-slate-50 border-b border-slate-200 p-4">
-          <div className="flex items-center justify-between text-sm font-bold text-slate-500">
+          <div className="flex items-center justify-between text-xs sm:text-sm font-bold text-slate-500">
             <span className={step >= 1 ? 'text-blue-600' : ''}>1. Personal</span>
             <span className={step >= 2 ? 'text-blue-600' : ''}>2. Contact</span>
             <span className={step >= 3 ? 'text-blue-600' : ''}>3. Guardian</span>
@@ -74,7 +80,7 @@ const ApplicationForm = () => {
           </div>
         </div>
 
-        <div className="p-8">
+        <div className="p-4 sm:p-8">
           <h2 className="text-xl font-bold mb-6 text-slate-800">
             {step === 1 && 'Personal Information'}
             {step === 2 && 'Contact Details'}

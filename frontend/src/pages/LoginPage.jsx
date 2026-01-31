@@ -80,17 +80,18 @@ const LoginPage = () => {
         <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 border-b border-slate-200 pb-6">
           {tabs.map((tab) => {
             const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
             return (
               <button
                 key={tab.id}
                 onClick={() => { setActiveTab(tab.id); setError(''); }}
                 className={`flex flex-col items-center justify-center p-3 rounded-xl transition-all duration-200 ${
-                  activeTab === tab.id 
-                    ? `${tab.bg} ${tab.color} ring-2 ring-offset-2 ring-${tab.color.split('-')[1]}` 
-                    : 'hover:bg-slate-50 text-slate-500'
+                  isActive 
+                    ? 'bg-slate-900 text-white shadow-md transform scale-105' 
+                    : 'bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-700'
                 }`}
               >
-                <Icon className="h-6 w-6 mb-1" />
+                <Icon className={`h-6 w-6 mb-1 ${isActive ? 'text-white' : tab.color}`} />
                 <span className="text-xs font-bold">{tab.label}</span>
               </button>
             );
