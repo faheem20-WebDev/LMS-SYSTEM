@@ -58,6 +58,12 @@ exports.submitApplication = async (req, res) => {
   const { program_id, personal_info, contact_info, guardian_info, education_info } = req.body;
   const applicant_id = req.user.id;
 
+  console.log('Receiving Application:', { applicant_id, program_id });
+
+  if (!program_id || isNaN(program_id)) {
+    return res.status(400).json({ msg: 'Invalid Program ID selected.' });
+  }
+
   try {
     // Check if already applied to this program
     const existing = await db.query(
@@ -79,8 +85,8 @@ exports.submitApplication = async (req, res) => {
 
     res.json(newApp.rows[0]);
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server error');
+    console.error('Submit Application Error:', err.message);
+    res.status(500).send('Server error: ' + err.message);
   }
 };
 
