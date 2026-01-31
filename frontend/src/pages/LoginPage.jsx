@@ -62,7 +62,7 @@ const LoginPage = () => {
   const ActiveIcon = activeTabConfig.icon;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4 py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 px-6 py-12 sm:px-6 lg:px-8">
       <div className="max-w-2xl w-full space-y-8 bg-white p-8 rounded-2xl shadow-xl border border-slate-100">
         
         {/* Header */}
@@ -77,7 +77,7 @@ const LoginPage = () => {
         </div>
 
         {/* Tabs */}
-        <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 border-b border-slate-200 pb-6">
+        <div className="flex flex-wrap justify-center gap-2 border-b border-slate-200 pb-6">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -85,10 +85,10 @@ const LoginPage = () => {
               <button
                 key={tab.id}
                 onClick={() => { setActiveTab(tab.id); setError(''); }}
-                className={`flex flex-col items-center justify-center p-3 rounded-xl transition-all duration-200 ${
+                className={`flex flex-col items-center justify-center p-3 w-20 sm:w-24 rounded-xl transition-all duration-200 ${
                   isActive 
-                    ? 'bg-slate-900 text-white shadow-md transform scale-105' 
-                    : 'bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-700'
+                    ? 'bg-slate-900 text-white shadow-lg ring-2 ring-slate-700 transform scale-105' 
+                    : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-100 hover:text-slate-900 hover:border-slate-300'
                 }`}
               >
                 <Icon className={`h-6 w-6 mb-1 ${isActive ? 'text-white' : tab.color}`} />
