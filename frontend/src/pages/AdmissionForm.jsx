@@ -4,12 +4,62 @@ import { ArrowLeft, CheckCircle, Loader2 } from 'lucide-react';
 import logo from '../assets/logo.png';
 
 const AdmissionForm = () => {
-  // ... existing code ...
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [formData, setFormData] = useState({
+    fullName: '',
+    email: '',
+    phone: '',
+    cnic: '',
+    dob: '',
+    program: 'BSCS',
+    matricMarks: '',
+    interMarks: '',
+    address: ''
+  });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    // Simulate API call for now (Will connect to backend later)
+    setTimeout(() => {
+      setLoading(false);
+      setSuccess(true);
+    }, 1500);
+  };
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  if (success) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+        <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full text-center border-t-4 border-green-500">
+          <div className="flex justify-center mb-6">
+            <div className="bg-green-100 p-4 rounded-full">
+              <CheckCircle className="h-12 w-12 text-green-600" />
+            </div>
+          </div>
+          <h2 className="text-2xl font-bold text-slate-800 mb-2">Application Submitted!</h2>
+          <p className="text-slate-600 mb-8">
+            Thank you for applying to RSIIT. Your application ID has been sent to <strong>{formData.email}</strong>.
+            Admissions office will contact you shortly.
+          </p>
+          <button
+            onClick={() => navigate('/')}
+            className="w-full bg-slate-900 text-white py-3 rounded-lg font-semibold hover:bg-slate-800 transition-colors"
+          >
+            Return to Home
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    // ... existing jsx ...
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 -mt-12 pb-12">
-        {/* ... */}
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-slate-100">
           {/* Header inside card - simplified */}
           <div className="bg-white py-8 px-8 text-center border-b border-slate-100">
@@ -18,7 +68,6 @@ const AdmissionForm = () => {
           </div>
           
           <form onSubmit={handleSubmit} className="p-8 space-y-8">
-            {/* ... */}
             {/* Personal Information */}
             <section>
               <h3 className="text-lg font-bold text-primary border-b border-slate-100 pb-2 mb-4">Personal Information</h3>
@@ -81,7 +130,6 @@ const AdmissionForm = () => {
           </form>
         </div>
       </div>
-    </div>
   );
 };
 
