@@ -84,12 +84,33 @@ exports.getApplications = async (req, res) => {
 exports.updateAppStatus = async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
+  
   try {
+    // Start a transaction would be better, but keeping it simple for now
     const result = await db.query(
       'UPDATE applications SET status = $1 WHERE id = $2 RETURNING *',
       [status, id]
     );
-    res.json(result.rows[0]);
+    
+    const application = result.rows[0];
+
+    // If admitted, upgrade user to student and generate enrollment #
+    if (status === 'admitted' && application) {
+       // Generate Enrollment No: RSIIT-Year-{Random4Digits}
+       const year = new Date().getFullYear();
+       const randomPart = Math.floor(1000 + Math.random() * 9000);
+       const enrollmentNo = `RSIIT-${year}-${randomPart}`;
+       
+       // Update User
+       await db.query(
+         "UPDATE users SET role = 'student', enrollment_no = $1 WHERE id = $2",
+         [enrollmentNo, application.applicant_id]
+       );
+       
+       console.log(`User ${application.applicant_id} admitted as Student with ID: ${enrollmentNo}`);
+    }
+
+    res.json(application);
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error');

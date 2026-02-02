@@ -101,7 +101,7 @@ exports.submitApplication = async (req, res) => {
 exports.getMyApplications = async (req, res) => {
   try {
     const apps = await db.query(`
-      SELECT a.id, a.status, a.submitted_at, p.name as program_name, p.code
+      SELECT a.id, a.status, a.submitted_at, a.profile_image, a.voucher_image, p.name as program_name, p.code
       FROM applications a
       JOIN programs p ON a.program_id = p.id
       WHERE a.applicant_id = $1
@@ -109,6 +109,32 @@ exports.getMyApplications = async (req, res) => {
     `, [req.user.id]);
     
     res.json(apps.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+};
+
+exports.updateDocuments = async (req, res) => {
+  const { applicationId, type, filePath } = req.body;
+  
+  try {
+    let query = '';
+    if (type === 'profile') {
+      query = 'UPDATE applications SET profile_image = $1 WHERE id = $2 AND applicant_id = $3 RETURNING *';
+    } else if (type === 'voucher') {
+      query = 'UPDATE applications SET voucher_image = $1 WHERE id = $2 AND applicant_id = $3 RETURNING *';
+    } else {
+      return res.status(400).json({ msg: 'Invalid document type' });
+    }
+
+    const result = await db.query(query, [filePath, applicationId, req.user.id]);
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ msg: 'Application not found or unauthorized' });
+    }
+
+    res.json(result.rows[0]);
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error');

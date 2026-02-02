@@ -1,19 +1,80 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import { useApplicant } from '../../../context/ApplicantContext';
-import { CheckCircle, Clock, FileText, CreditCard, Upload } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { CheckCircle, Clock, FileText, CreditCard, Upload, PartyPopper } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const HomeTab = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth(); // Assuming fetchUser is internal to AuthContext, we'll fetch manually here if needed
   const { isProfileComplete, hasSubmittedApplication, hasFeeVoucher, applications } = useApplicant();
+  const [enrollmentNo, setEnrollmentNo] = useState(user?.enrollment_no);
+  const navigate = useNavigate();
+
+  const admittedApp = applications.find(app => app.status === 'admitted');
+
+  useEffect(() => {
+    // If admitted but no enrollment number in context yet, fetch it
+    if (admittedApp && !enrollmentNo) {
+      const fetchFreshUser = async () => {
+        try {
+          const res = await axios.get('https://muhammadfaheem52006-lmsbackend.hf.space/api/auth/me', {
+            headers: { 'x-auth-token': localStorage.getItem('token') }
+          });
+          setEnrollmentNo(res.data.enrollment_no);
+        } catch (err) {
+          console.error("Failed to fetch enrollment no", err);
+        }
+      };
+      fetchFreshUser();
+    } else if (user?.enrollment_no) {
+        setEnrollmentNo(user.enrollment_no);
+    }
+  }, [admittedApp, user]);
 
   const steps = [
     { id: 1, title: 'Complete Profile', description: 'Personal & Guardian Info', status: isProfileComplete ? 'completed' : 'pending', link: '/applicant/dashboard/profile' },
     { id: 2, title: 'Apply for Program', description: 'Select Degree & Education', status: hasSubmittedApplication ? 'completed' : (isProfileComplete ? 'pending' : 'locked'), link: '/applicant/dashboard/apply' },
-    { id: 3, title: 'Upload Documents', description: 'CNIC, Mark Sheets', status: hasSubmittedApplication ? 'pending' : 'locked', link: '/applicant/dashboard/documents' }, // Simplified status logic
+    { id: 3, title: 'Upload Documents', description: 'CNIC, Mark Sheets', status: hasSubmittedApplication ? 'pending' : 'locked', link: '/applicant/dashboard/documents' },
     { id: 4, title: 'Fee Voucher', description: 'Download & Pay', status: hasFeeVoucher ? 'pending' : 'locked', link: '/applicant/dashboard/voucher' },
   ];
+
+  const handleStudentLogin = () => {
+    logout();
+    navigate('/login?tab=student');
+  };
+
+  if (admittedApp) {
+    return (
+      <div className="max-w-4xl mx-auto space-y-6">
+        <div className="bg-green-600 rounded-2xl p-8 text-white text-center shadow-xl relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-full opacity-10">
+                <PartyPopper className="w-full h-full" />
+            </div>
+            <div className="relative z-10">
+                <div className="inline-flex p-3 bg-white/20 rounded-full mb-4">
+                    <CheckCircle className="h-8 w-8 text-white" />
+                </div>
+                <h1 className="text-3xl font-bold mb-2">Congratulations, {user?.name}!</h1>
+                <p className="text-green-100 text-lg mb-6">Your admission has been approved.</p>
+                
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 max-w-lg mx-auto border border-white/20 mb-8">
+                    <p className="text-sm uppercase tracking-widest text-green-200 mb-1">Your Enrollment Number</p>
+                    <div className="text-3xl font-mono font-bold tracking-wider">{enrollmentNo || 'Loading...'}</div>
+                    <p className="text-xs text-green-200 mt-2">Use this ID or your email to log in to the Student Portal.</p>
+                </div>
+
+                <button 
+                    onClick={handleStudentLogin}
+                    className="bg-white text-green-700 px-8 py-3 rounded-lg font-bold shadow-lg hover:bg-green-50 transition-transform transform hover:-translate-y-1"
+                >
+                    Go to Student Portal
+                </button>
+            </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

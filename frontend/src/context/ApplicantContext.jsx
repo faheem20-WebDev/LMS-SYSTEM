@@ -44,7 +44,7 @@ export const ApplicantProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    if (user?.role === 'applicant') {
+    if (user?.role === 'applicant' || user?.role === 'student') {
       fetchApplications();
     } else {
       setLoading(false);

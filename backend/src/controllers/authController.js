@@ -42,10 +42,21 @@ exports.register = async (req, res) => {
 };
 
 exports.login = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password } = req.body; // 'email' field can now hold email or enrollment_no
 
   try {
-    let user = await db.query('SELECT * FROM users WHERE email = $1', [email]);
+    // Check if input is email or enrollment no
+    const isEmail = email.includes('@');
+    let query = '';
+    
+    if (isEmail) {
+      query = 'SELECT * FROM users WHERE email = $1';
+    } else {
+      query = 'SELECT * FROM users WHERE enrollment_no = $1';
+    }
+
+    let user = await db.query(query, [email]);
+
     if (user.rows.length === 0) {
       return res.status(400).json({ msg: 'Invalid Credentials' });
     }
@@ -74,7 +85,8 @@ exports.login = async (req, res) => {
             id: user.rows[0].id,
             name: user.rows[0].name,
             email: user.rows[0].email,
-            role: user.rows[0].role
+            role: user.rows[0].role,
+            enrollment_no: user.rows[0].enrollment_no
           }
         });
       }

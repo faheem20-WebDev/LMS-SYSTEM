@@ -5,7 +5,8 @@ const {
   registerApplicant, 
   getPrograms, 
   submitApplication, 
-  getMyApplications 
+  getMyApplications,
+  updateDocuments
 } = require('../controllers/applicantController');
 
 // Public routes
@@ -16,5 +17,6 @@ router.get('/programs', getPrograms); // Can be public to view catalog
 router.use(auth, authorize('applicant'));
 router.post('/apply', submitApplication);
 router.get('/my-applications', getMyApplications);
+router.put('/documents', updateDocuments); // Update docs (profile/voucher)
 
 module.exports = router;
