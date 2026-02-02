@@ -13,12 +13,14 @@ const AdmissionApplications = () => {
   const { token } = useAuth();
 
   useEffect(() => {
-    fetchApplications();
+    if (token) fetchApplications();
   }, [token]);
 
   const fetchApplications = async () => {
     try {
-      const res = await axios.get(`${API_URL}/admin/applications`);
+      const res = await axios.get(`${API_URL}/admin/applications`, {
+        headers: { 'x-auth-token': token }
+      });
       setApps(res.data);
     } catch (err) {
       console.error('Error fetching applications', err);

@@ -19,7 +19,7 @@ const AcademicManagement = () => {
   const [courseForm, setCourseForm] = useState({ code: '', name: '', description: '', credit_hours: 3 });
 
   useEffect(() => {
-    fetchData();
+    if (token) fetchData();
   }, [activeTab, token]);
 
   const fetchData = async () => {
@@ -29,7 +29,9 @@ const AcademicManagement = () => {
                      : activeTab === 'classes' ? '/admin/classes' 
                      : '/admin/courses';
       
-      const res = await axios.get(`${API_URL}${endpoint}`);
+      const res = await axios.get(`${API_URL}${endpoint}`, {
+        headers: { 'x-auth-token': token }
+      });
       setData(res.data);
     } catch (err) {
       console.error(err);
@@ -41,15 +43,16 @@ const AcademicManagement = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    const config = { headers: { 'x-auth-token': token } };
     try {
       if (activeTab === 'semesters') {
-        await axios.post(`${API_URL}/admin/semesters`, semesterForm);
+        await axios.post(`${API_URL}/admin/semesters`, semesterForm, config);
         setSemesterForm({ name: '', start_date: '', end_date: '' });
       } else if (activeTab === 'classes') {
-        await axios.post(`${API_URL}/admin/classes`, classForm);
+        await axios.post(`${API_URL}/admin/classes`, classForm, config);
         setClassForm({ name: '', department: '' });
       } else {
-        await axios.post(`${API_URL}/admin/courses`, courseForm);
+        await axios.post(`${API_URL}/admin/courses`, courseForm, config);
         setCourseForm({ code: '', name: '', description: '', credit_hours: 3 });
       }
       fetchData(); // Refresh list
@@ -62,7 +65,9 @@ const AcademicManagement = () => {
 
   const activateSemester = async (id) => {
     try {
-      await axios.put(`${API_URL}/admin/semesters/${id}/activate`);
+      await axios.put(`${API_URL}/admin/semesters/${id}/activate`, {}, {
+        headers: { 'x-auth-token': token }
+      });
       fetchData();
     } catch (err) {
       alert('Error activating semester');

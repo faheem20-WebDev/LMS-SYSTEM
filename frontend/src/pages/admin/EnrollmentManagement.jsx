@@ -1,3 +1,6 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import DashboardLayout from '../../components/DashboardLayout';
 import { CheckCircle, XCircle, Loader2, User, Book, Trash2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -10,12 +13,14 @@ const EnrollmentManagement = () => {
   const { token } = useAuth();
 
   useEffect(() => {
-    fetchRequests();
+    if (token) fetchRequests();
   }, [token]);
 
   const fetchRequests = async () => {
     try {
-      const res = await axios.get(`${API_URL}/courses/requests`);
+      const res = await axios.get(`${API_URL}/courses/requests`, {
+        headers: { 'x-auth-token': token }
+      });
       setRequests(res.data);
     } catch (err) {
       console.error('Error fetching requests', err);
@@ -30,6 +35,8 @@ const EnrollmentManagement = () => {
       await axios.put(`${API_URL}/courses/request-status`, {
         enrollment_id: id,
         status: status
+      }, {
+        headers: { 'x-auth-token': token }
       });
       // Remove the processed request from the list (or update status locally if we were showing all)
       setRequests(requests.filter(req => req.id !== id));
@@ -44,7 +51,9 @@ const EnrollmentManagement = () => {
     if (!window.confirm('Are you sure you want to permanently delete this application?')) return;
     setActionLoading(id);
     try {
-      await axios.delete(`${API_URL}/courses/requests/${id}`);
+      await axios.delete(`${API_URL}/courses/requests/${id}`, {
+        headers: { 'x-auth-token': token }
+      });
       setRequests(requests.filter(req => req.id !== id));
     } catch (err) {
       alert('Failed to delete application');
