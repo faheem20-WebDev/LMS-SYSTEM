@@ -7,7 +7,7 @@ const ApplicantContext = createContext();
 export const useApplicant = () => useContext(ApplicantContext);
 
 export const ApplicantProvider = ({ children }) => {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -34,7 +34,11 @@ export const ApplicantProvider = ({ children }) => {
   const fetchApplications = async () => {
     try {
       // Assuming existing API endpoint
-      const res = await axios.get('https://muhammadfaheem52006-lmsbackend.hf.space/api/applicants/my-applications');
+      const res = await axios.get('https://muhammadfaheem52006-lmsbackend.hf.space/api/applicants/my-applications', {
+        headers: {
+          'x-auth-token': token || localStorage.getItem('token')
+        }
+      });
       setApplications(res.data);
     } catch (err) {
       console.error("Failed to fetch applications", err);

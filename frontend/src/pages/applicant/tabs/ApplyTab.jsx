@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useApplicant } from '../../../context/ApplicantContext';
+import { useAuth } from '../../../context/AuthContext';
 import { CheckCircle, AlertCircle, GraduationCap } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -8,6 +9,7 @@ const API_URL = 'https://muhammadfaheem52006-lmsbackend.hf.space/api';
 
 const ApplyTab = () => {
   const { profile, education, setEducation, fetchApplications } = useApplicant();
+  const { token } = useAuth();
   const [programs, setPrograms] = useState([]);
   const [selectedProgram, setSelectedProgram] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -65,7 +67,9 @@ const ApplyTab = () => {
         ]
       };
 
-      await axios.post(`${API_URL}/applicants/apply`, payload);
+      await axios.post(`${API_URL}/applicants/apply`, payload, {
+        headers: { 'x-auth-token': token }
+      });
       await fetchApplications(); // Refresh context
       navigate('/applicant/dashboard/documents');
     } catch (err) {

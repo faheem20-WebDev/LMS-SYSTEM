@@ -18,7 +18,9 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await axios.get('https://muhammadfaheem52006-lmsbackend.hf.space/api/admin/stats');
+        const res = await axios.get('https://muhammadfaheem52006-lmsbackend.hf.space/api/admin/stats', {
+          headers: { 'x-auth-token': token }
+        });
         setStats(res.data);
       } catch (err) {
         console.error('Error fetching admin stats', err);
