@@ -1,24 +1,38 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #0A2540;
-  --color-secondary: #FFFFFF;
-  --color-accent: #F4A261;
-  --color-highlight: #2EC4B6;
-  
-  --color-bg-light: #F5F7FA;
+  /* ── New SaaS Design Tokens ── */
+  --color-primary:        #172B46;
+  --color-primary-blue:   #2563EB;
+  --color-accent:         #F4A261;
+  --color-highlight:      #2EC4B6;
 
-  /* Legacy Mappings */
-  --color-rsiit-blue: #0A2540; 
-  --color-rsiit-lightBlue: #2EC4B6;
-  --color-rsiit-slate: #334155;
+  --color-bg-light:       #F3F6FA;
+  --color-surface:        #FFFFFF;
+  --color-border:         #E2E8F0;
+
+  --color-text-primary:   #172B46;
+  --color-text-secondary: #64748B;
+
+  /* Sidebar */
+  --color-sidebar-bg:     #172B46;
+  --color-sidebar-hover:  #1E3A5F;
+  --color-sidebar-active: #2563EB;
+
+  /* Legacy mappings kept for compatibility */
+  --color-secondary:        #FFFFFF;
+  --color-rsiit-blue:       #172B46;
+  --color-rsiit-lightBlue:  #2EC4B6;
+  --color-rsiit-slate:      #172B46;
 
   --font-heading: 'Poppins', sans-serif;
-  --font-body: 'Inter', sans-serif;
+  --font-body:    'Inter', sans-serif;
 }
 
 :root {
   font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
@@ -26,28 +40,76 @@ body {
   min-width: 320px;
   min-height: 100vh;
   background-color: var(--color-bg-light);
-  color: var(--color-primary);
+  color: var(--color-text-primary);
 }
 
 @layer components {
+  /* ── Form ── */
   .input {
-    @apply w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary outline-none transition-all;
+    @apply w-full px-4 py-3 border border-[#E2E8F0] rounded-xl bg-white text-[#172B46]
+           placeholder:text-[#94A3B8] focus:ring-2 focus:ring-[#2563EB] focus:border-[#2563EB]
+           outline-none transition-all duration-200 text-sm;
   }
   .label {
-    @apply block text-sm font-semibold text-slate-700 mb-1;
+    @apply block text-sm font-semibold text-[#172B46] mb-1.5;
   }
-  
-  /* University Component Classes */
+
+  /* ── Buttons ── */
   .btn-primary {
-    @apply bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-slate-800 transition-all shadow-md hover:shadow-lg cursor-pointer border border-transparent;
+    @apply bg-[#172B46] text-white px-6 py-3 rounded-xl font-semibold text-sm
+           hover:bg-[#1E3A5F] active:scale-[0.98] transition-all duration-200
+           shadow-sm hover:shadow-md cursor-pointer border border-transparent;
+  }
+  .btn-blue {
+    @apply bg-[#2563EB] text-white px-6 py-3 rounded-xl font-semibold text-sm
+           hover:bg-[#1D4ED8] active:scale-[0.98] transition-all duration-200
+           shadow-sm hover:shadow-md cursor-pointer;
   }
   .btn-accent {
-    @apply bg-accent text-white px-6 py-3 rounded-lg font-semibold hover:bg-orange-500 transition-all shadow-md hover:shadow-lg cursor-pointer;
+    @apply bg-[#F4A261] text-white px-6 py-3 rounded-xl font-semibold text-sm
+           hover:bg-orange-500 active:scale-[0.98] transition-all duration-200
+           shadow-sm hover:shadow-md cursor-pointer;
   }
+  .btn-ghost {
+    @apply bg-transparent text-[#172B46] px-6 py-3 rounded-xl font-semibold text-sm
+           hover:bg-[#F3F6FA] transition-all duration-200 cursor-pointer border border-[#E2E8F0];
+  }
+
+  /* ── Cards ── */
   .card {
-    @apply bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden;
+    @apply bg-white rounded-2xl border border-[#E2E8F0] shadow-sm
+           hover:shadow-md transition-all duration-300 overflow-hidden;
   }
-  .section-padding {
-    @apply py-16 md:py-24;
+  .card-flat {
+    @apply bg-white rounded-2xl border border-[#E2E8F0] overflow-hidden;
   }
+
+  /* ── Stat cards ── */
+  .stat-card {
+    @apply bg-white rounded-2xl border border-[#E2E8F0] p-6 flex items-center gap-4
+           shadow-sm hover:shadow-md transition-all duration-200;
+  }
+
+  /* ── Badges ── */
+  .badge        { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold; }
+  .badge-blue   { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700; }
+  .badge-green  { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700; }
+  .badge-amber  { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-700; }
+  .badge-red    { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-700; }
+  .badge-slate  { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600; }
+
+  /* ── Layout ── */
+  .section-padding { @apply py-16 md:py-24; }
+  .page-container  { @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8; }
+
+  /* ── Dashboard section heading ── */
+  .dash-heading {
+    @apply text-xl font-bold text-[#172B46];
+  }
+  .dash-subheading {
+    @apply text-sm text-[#64748B] mt-0.5;
+  }
+
+  /* ── Divider ── */
+  .divider { @apply border-t border-[#E2E8F0]; }
 }
