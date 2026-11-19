@@ -17,7 +17,7 @@ const LandingPage = () => {
       <SEO />
       
       {/* Hero Section */}
-      <section className="relative h-screen min-h-[600px] flex items-center bg-primary overflow-hidden">
+      <section id="home" className="relative min-h-[600px] lg:min-h-[calc(100vh-4.5rem)] flex items-center bg-primary overflow-hidden">
         {/* Abstract Background Shapes */}
         <div className="absolute inset-0 z-0">
            <div className="absolute top-0 right-0 w-[50vw] h-[50vw] bg-blue-900/20 rounded-full blur-3xl transform translate-x-1/3 -translate-y-1/3"></div>
@@ -91,7 +91,7 @@ const LandingPage = () => {
       </section>
 
       {/* About Summary */}
-      <section className="section-padding bg-white">
+      <section id="about" className="section-padding bg-white scroll-mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div {...fadeInUp} className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold text-primary mb-6 font-heading">Excellence in Education</h2>
@@ -127,7 +127,7 @@ const LandingPage = () => {
       </section>
 
       {/* Programs Overview */}
-      <section className="section-padding bg-slate-50">
+      <section id="courses" className="section-padding bg-slate-50 scroll-mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-end mb-12">
              <div>
@@ -177,7 +177,7 @@ const LandingPage = () => {
       </section>
 
       {/* Why Choose Us */}
-      <section className="section-padding bg-primary text-white overflow-hidden relative">
+      <section id="features" className="section-padding bg-primary text-white overflow-hidden relative scroll-mt-20">
          <div className="absolute top-0 right-0 w-96 h-96 bg-highlight/10 rounded-full blur-3xl"></div>
          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
            <div className="grid lg:grid-cols-2 gap-16 items-center">
@@ -231,7 +231,7 @@ const LandingPage = () => {
       </section>
 
       {/* Admissions Timeline */}
-      <section className="section-padding bg-white">
+      <section id="admissions" className="section-padding bg-white scroll-mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold text-primary mb-4 font-heading">Admissions Process</h2>
@@ -274,7 +274,7 @@ const LandingPage = () => {
       </section>
 
       {/* Testimonials */}
-      <section className="section-padding bg-slate-50">
+      <section id="testimonials" className="section-padding bg-slate-50 scroll-mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
            <h2 className="text-3xl font-bold text-center text-primary mb-12 font-heading">What Our Students Say</h2>
            <div className="grid md:grid-cols-3 gap-8">

@@ -1,17 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, ChevronRight } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import logo from '../assets/logo.png';
+
+const navItems = [
+  { name: 'Home', path: '/', isHash: false },
+  { name: 'Features', path: '/#features', targetId: 'features', isHash: true },
+  { name: 'Courses', path: '/programs', isHash: false },
+  { name: 'About Us', path: '/about', isHash: false },
+  { name: 'Contact', path: '/contact', isHash: false },
+];
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState('home');
   const location = useLocation();
-  const isHome = location.pathname === '/';
 
-  const toggleMenu = () => setIsOpen(!isOpen);
-
+  // Scroll detection for sticky navbar background transition and landing page active section highlight
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 20) {
@@ -19,88 +26,189 @@ const Navbar = () => {
       } else {
         setScrolled(false);
       }
+
+      if (location.pathname === '/') {
+        const featuresEl = document.getElementById('features');
+        if (featuresEl) {
+          const rect = featuresEl.getBoundingClientRect();
+          if (rect.top <= 300 && rect.bottom >= 150) {
+            setActiveSection('features');
+            return;
+          }
+        }
+
+        if (window.scrollY < 300) {
+          setActiveSection('home');
+          return;
+        }
+
+        setActiveSection('');
+      } else {
+        setActiveSection('');
+      }
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [location.pathname]);
 
-  const navLinks = [
-    { name: 'Home', path: '/' },
-    { name: 'About', path: '/about' },
-    { name: 'Programs', path: '/programs' },
-    { name: 'Admissions', path: '/admissions' },
-    { name: 'Campus Life', path: '/campus-life' },
-    { name: 'Contact', path: '/contact' },
-  ];
-
-  // Dynamic Styles - Transparent at top, solid on scroll for ALL pages
-  const isTransparent = !scrolled;
-  
-  const navBackground = isTransparent ? 'bg-transparent py-4' : 'bg-white shadow-md py-2 transition-all duration-300';
-  const logoText = isTransparent ? 'text-white' : 'text-primary';
-  
-  const getLinkClass = (path) => {
-    const isActive = location.pathname === path;
-    if (isActive) {
-      return isTransparent ? 'text-white font-bold border-b-2 border-highlight' : 'text-highlight font-semibold';
+  // Handle hash scrolling when arriving from other routes
+  useEffect(() => {
+    if (location.pathname === '/' && location.hash) {
+      const targetId = location.hash.replace('#', '');
+      const timer = setTimeout(() => {
+        const el = document.getElementById(targetId);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+          setActiveSection(targetId);
+        }
+      }, 150);
+      return () => clearTimeout(timer);
     }
-    return isTransparent 
-      ? 'text-white/80 hover:text-white' 
-      : 'text-slate-600 hover:text-highlight';
+  }, [location.pathname, location.hash]);
+
+  // Prevent background scrolling when mobile menu drawer is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
+  // Handle navigation clicks for smooth section scrolling
+  const handleNavClick = (e, item) => {
+    setIsOpen(false);
+
+    if (item.name === 'Home') {
+      if (location.pathname === '/' && !location.hash) {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setActiveSection('home');
+      }
+    } else if (item.isHash) {
+      if (location.pathname === '/') {
+        e.preventDefault();
+        const el = document.getElementById(item.targetId);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+          window.history.pushState(null, '', `#${item.targetId}`);
+          setActiveSection(item.targetId);
+        }
+      }
+    }
   };
 
-  const mobileMenuBg = 'bg-white';
+  // Determine active state for links
+  const isItemActive = (item) => {
+    if (item.name === 'Home') {
+      return (
+        location.pathname === '/' &&
+        (!location.hash || location.hash === '#home' || location.hash === '#top') &&
+        activeSection !== 'features'
+      );
+    }
+    if (item.name === 'Features') {
+      return location.pathname === '/' && (location.hash === '#features' || activeSection === 'features');
+    }
+    if (item.name === 'Courses') {
+      return location.pathname.startsWith('/programs');
+    }
+    if (item.name === 'About Us') {
+      return location.pathname.startsWith('/about');
+    }
+    if (item.name === 'Contact') {
+      return location.pathname.startsWith('/contact');
+    }
+    return false;
+  };
 
   return (
-    <nav 
-      className={`fixed w-full z-[100] transition-all duration-300 ${navBackground}`}
+    <header
+      className={`sticky top-0 z-50 w-full transition-all duration-300 font-sans ${
+        scrolled
+          ? 'bg-white/95 backdrop-blur-md shadow-[0_4px_20px_-4px_rgba(0,0,0,0.06)] border-b border-slate-200/90 py-2.5'
+          : 'bg-white/90 backdrop-blur-md border-b border-slate-100 py-3.5'
+      }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
+        <div className="flex items-center justify-between">
+          
+          {/* LEFT: Logo and Brand Name */}
           <div className="flex-shrink-0 flex items-center">
-            <Link to="/" className="flex items-center gap-2 group">
-              <img src={logo} alt="RSIIT Logo" className="h-12 w-auto object-contain" />
-              <span className={`text-2xl font-bold tracking-tight ${logoText}`}>
-                RSIIT
-              </span>
+            <Link
+              to="/"
+              onClick={(e) => handleNavClick(e, { name: 'Home' })}
+              className="flex items-center gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 rounded-lg select-none"
+              aria-label="RSIIT LMS Home"
+            >
+              <img
+                src={logo}
+                alt="RSIIT LMS Logo"
+                className="h-9 sm:h-10 w-auto object-contain transition-transform duration-200 group-hover:scale-[1.02]"
+              />
+              <div className="flex items-center gap-2">
+                <span className="text-xl font-bold tracking-tight text-[#172B46] font-heading">
+                  RSIIT
+                </span>
+                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase bg-blue-50 text-blue-700 border border-blue-200/60 font-sans">
+                  LMS
+                </span>
+              </div>
             </Link>
           </div>
 
-          {/* Desktop Menu */}
-          <div className="hidden lg:flex items-center space-x-1">
-            {navLinks.map((link) => (
-              <Link 
-                key={link.name} 
-                to={link.path} 
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${getLinkClass(link.path)}`}
-              >
-                {link.name}
-              </Link>
-            ))}
-            
-            <Link 
-              to="/login" 
-              className={`ml-4 text-sm px-5 py-2.5 flex items-center gap-2 shadow-md hover:shadow-lg transition-all rounded-lg font-semibold ${
-                isTransparent 
-                  ? 'bg-white text-primary hover:bg-slate-100' 
-                  : 'btn-primary'
-              }`}
+          {/* CENTER: Navigation Links */}
+          <nav className="hidden lg:flex items-center gap-1 xl:gap-2" aria-label="Main Navigation">
+            {navItems.map((item) => {
+              const active = isItemActive(item);
+              return (
+                <Link
+                  key={item.name}
+                  to={item.path}
+                  onClick={(e) => handleNavClick(e, item)}
+                  className={`px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600/50 ${
+                    active
+                      ? 'text-blue-600 bg-blue-50/80 font-semibold'
+                      : 'text-slate-600 hover:text-[#172B46] hover:bg-slate-100/70'
+                  }`}
+                >
+                  {item.name}
+                </Link>
+              );
+            })}
+          </nav>
+
+          {/* RIGHT: Login & Primary CTA (Get Started) */}
+          <div className="hidden lg:flex items-center gap-3">
+            <Link
+              to="/login"
+              className="text-sm font-medium text-[#172B46] hover:text-blue-600 hover:bg-slate-100/80 px-4 py-2 rounded-lg transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600/50"
             >
-              Portal Login
-              <ChevronRight className="h-4 w-4" />
+              Login
+            </Link>
+
+            <Link
+              to="/applicant/register"
+              className="inline-flex items-center justify-center text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 px-4 py-2 rounded-lg shadow-sm hover:shadow active:scale-[0.99] transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
+            >
+              Get Started
             </Link>
           </div>
 
           {/* Mobile menu button */}
-          <div className="lg:hidden flex items-center gap-4">
-            <button 
-              onClick={toggleMenu} 
-              className={`focus:outline-none p-2 rounded-md ${isTransparent ? 'text-white hover:bg-white/10' : 'text-slate-700 hover:bg-slate-100'}`}
-              aria-label="Toggle menu"
+          <div className="lg:hidden flex items-center">
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              aria-label={isOpen ? 'Close navigation menu' : 'Open navigation menu'}
+              aria-expanded={isOpen}
+              className="p-2 rounded-lg text-slate-700 hover:text-[#172B46] hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 transition-colors"
             >
-              {isOpen ? <X className="h-7 w-7" /> : <Menu className="h-7 w-7" />}
+              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
         </div>
@@ -110,64 +218,94 @@ const Navbar = () => {
       <AnimatePresence>
         {isOpen && (
           <>
-            <motion.div 
+            {/* Backdrop Overlay */}
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 z-40 lg:hidden backdrop-blur-sm"
-              onClick={toggleMenu}
+              transition={{ duration: 0.2 }}
+              onClick={() => setIsOpen(false)}
+              className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 lg:hidden"
+              aria-hidden="true"
             />
-            <motion.div 
+
+            {/* Slide-out Drawer */}
+            <motion.div
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className={`fixed inset-y-0 right-0 w-80 shadow-2xl z-50 lg:hidden overflow-y-auto ${mobileMenuBg}`}
+              transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+              className="fixed inset-y-0 right-0 w-full max-w-xs sm:max-w-sm bg-white shadow-2xl z-50 lg:hidden flex flex-col justify-between overflow-y-auto"
             >
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-8 border-b border-gray-100 pb-4">
-                  <div className="flex items-center gap-2">
-                    <img src={logo} alt="RSIIT Logo" className="h-10 w-auto" />
-                    <span className="text-xl font-bold text-primary">RSIIT</span>
-                  </div>
-                  <button onClick={toggleMenu} className="text-gray-400 hover:text-primary">
-                    <X className="h-6 w-6" />
+              <div>
+                {/* Drawer Header */}
+                <div className="p-5 border-b border-slate-100 flex items-center justify-between">
+                  <Link
+                    to="/"
+                    onClick={(e) => handleNavClick(e, { name: 'Home' })}
+                    className="flex items-center gap-2.5"
+                  >
+                    <img src={logo} alt="RSIIT LMS Logo" className="h-8 w-auto object-contain" />
+                    <span className="text-lg font-bold text-[#172B46] font-heading">RSIIT</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200/60 font-sans">
+                      LMS
+                    </span>
+                  </Link>
+                  <button
+                    onClick={() => setIsOpen(false)}
+                    className="p-2 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors focus:outline-none"
+                    aria-label="Close menu"
+                  >
+                    <X className="h-5 w-5" />
                   </button>
                 </div>
-                
-                <div className="flex flex-col space-y-2">
-                  {navLinks.map((link) => (
-                    <Link 
-                      key={link.name}
-                      to={link.path} 
-                      className={`px-4 py-3 rounded-lg text-base font-medium transition-colors ${
-                         location.pathname === link.path 
-                          ? 'bg-primary/5 text-primary' 
-                          : 'text-slate-600 hover:bg-gray-50 hover:text-primary'
-                      }`}
-                      onClick={toggleMenu}
-                    >
-                      {link.name}
-                    </Link>
-                  ))}
-                  
-                  <div className="pt-6 mt-4 border-t border-gray-100">
-                    <Link 
-                      to="/login" 
-                      className="w-full btn-primary flex justify-center items-center gap-2"
-                      onClick={toggleMenu}
-                    >
-                      Portal Login
-                      <ChevronRight className="h-4 w-4" />
-                    </Link>
-                  </div>
+
+                {/* Navigation Links */}
+                <div className="p-4 space-y-1">
+                  {navItems.map((item) => {
+                    const active = isItemActive(item);
+                    return (
+                      <Link
+                        key={item.name}
+                        to={item.path}
+                        onClick={(e) => handleNavClick(e, item)}
+                        className={`flex items-center justify-between px-4 py-3 rounded-xl text-base font-medium transition-colors ${
+                          active
+                            ? 'bg-blue-50 text-blue-600 font-semibold'
+                            : 'text-slate-700 hover:bg-slate-50 hover:text-[#172B46]'
+                        }`}
+                      >
+                        <span>{item.name}</span>
+                        {active && <span className="h-1.5 w-1.5 rounded-full bg-blue-600"></span>}
+                      </Link>
+                    );
+                  })}
                 </div>
+              </div>
+
+              {/* Bottom Actions */}
+              <div className="p-5 border-t border-slate-100 bg-slate-50/60 space-y-2.5">
+                <Link
+                  to="/applicant/register"
+                  onClick={() => setIsOpen(false)}
+                  className="w-full inline-flex items-center justify-center text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 py-3 px-4 rounded-xl shadow-sm transition-colors"
+                >
+                  Get Started
+                </Link>
+
+                <Link
+                  to="/login"
+                  onClick={() => setIsOpen(false)}
+                  className="w-full inline-flex items-center justify-center text-sm font-semibold text-[#172B46] bg-white hover:bg-slate-100 border border-slate-200 py-3 px-4 rounded-xl transition-colors shadow-xs"
+                >
+                  Login
+                </Link>
               </div>
             </motion.div>
           </>
         )}
       </AnimatePresence>
-    </nav>
+    </header>
   );
 };
 
